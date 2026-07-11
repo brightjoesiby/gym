@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FitCouple 💪</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--border:#2a2a3a;
+  --accent:#6c63ff;--pink:#ff6584;--green:#00d4aa;--yellow:#ffd166;
+  --text:#f0f0f5;--muted:#7a7a9a;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden}
+#app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative}
+
+/* ── HEADER ── */
+#header{padding:52px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.user-toggle{display:flex;gap:6px;background:var(--surface2);border-radius:12px;padding:4px}
+.utb{flex:1;padding:9px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .2s}
+.utb.ab{background:var(--accent);color:#fff}
+.utb.ad{background:var(--pink);color:#fff}
+
+/* ── NAV ── */
+#nav{display:flex;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 12px;background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;transition:color .2s}
+.nb.on{color:var(--accent)}
+.nb svg{width:22px;height:22px}
+
+/* ── PAGES ── */
+#pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;padding:16px 16px 20px;display:none;animation:fi .25s ease}
+.page.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.ca{border-color:var(--accent)!important;background:linear-gradient(135deg,rgba(108,99,255,.08),var(--surface))}
+.cg{border-color:var(--green)!important;background:linear-gradient(135deg,rgba(0,212,170,.07),var(--surface))}
+.cp{border-color:var(--pink)!important;background:linear-gradient(135deg,rgba(255,101,132,.07),var(--surface))}
+
+/* ── TYPOGRAPHY ── */
+h1{font-size:22px;font-weight:800;margin-bottom:2px}
+h2{font-size:16px;font-weight:700;margin-bottom:10px}
+.lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.muted{color:var(--muted);font-size:13px}
+.ph{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--pink));color:#fff;display:inline-block;margin-bottom:10px}
+
+/* ── TAGS ── */
+.tag{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
+.tp{background:rgba(108,99,255,.2);color:var(--accent)}
+.tg{background:rgba(0,212,170,.2);color:var(--green)}
+.ty{background:rgba(255,209,102,.2);color:var(--yellow)}
+.tk{background:rgba(255,101,132,.2);color:var(--pink)}
+.tm{background:rgba(122,122,154,.15);color:var(--muted)}
+
+/* ── RING SVG ── */
+.ring-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.ring-inner{position:absolute;text-align:center;pointer-events:none}
+
+/* ── STAT GRID ── */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.sc{background:var(--surface2);border-radius:12px;padding:14px}
+.big{font-size:28px;font-weight:900}
+
+/* ── MACRO BAR ── */
+.mbg{background:var(--surface2);border-radius:4px;height:7px;overflow:hidden;margin-top:4px}
+.mbf{height:100%;border-radius:4px;transition:width .5s}
+
+/* ── DAY CARDS ── */
+.dc{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
+.dc:hover,.dc.today{border-color:var(--accent)}
+.dc.rest{border-color:var(--green)}
+.dc-body{display:none;padding-top:12px;border-top:1px solid var(--border);margin-top:10px}
+.dc-body.open{display:block}
+
+/* ── EXERCISE ITEMS ── */
+.ex-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)}
+.ex-row:last-child{border:none}
+.exn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px}
+
+/* ── LOG ── */
+.set-tbl{width:100%;border-collapse:collapse;margin-bottom:8px}
+.set-tbl th{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;padding:4px 6px;text-align:center}
+.set-tbl td{padding:5px 6px;text-align:center}
+.si{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-weight:600;padding:7px 8px;width:72px;text-align:center}
+.si:focus{outline:none;border-color:var(--accent)}
+
+/* ── BUTTONS ── */
+.btn{padding:12px 20px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;width:100%;transition:all .2s}
+.bp{color:#fff}
+.bo{background:transparent;border:1px solid var(--border);color:var(--text)}
+.bsm{padding:6px 10px;font-size:12px;border-radius:8px;width:auto}
+.brd{background:rgba(255,101,132,.15);color:var(--pink);border:1px solid var(--pink)}
+.bgo{background:rgba(0,212,170,.15);color:var(--green);border:1px solid var(--green)}
+
+/* ── PROGRESS BAR ── */
+.pb-wrap{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;transition:width .4s}
+
+/* ── INPUT ── */
+.inp{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:10px 12px;width:100%;margin-bottom:8px}
+.inp:focus{outline:none;border-color:var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ── COMPARE ── */
+.cbar{display:flex;align-items:center;gap:8px;margin:5px 0}
+.clbl{width:52px;font-size:12px;color:var(--muted)}
+.cbw{flex:1;background:var(--surface2);border-radius:4px;height:8px;overflow:hidden}
+.cbf{height:100%;border-radius:4px}
+
+/* ── COUPLE CARDS ── */
+.cc2{display:flex;gap:10px;margin-bottom:12px}
+.cc2 .ccu{flex:1;background:var(--surface2);border-radius:12px;padding:12px}
+
+/* ── TIP BOX ── */
+.tipbox{font-size:11px;color:var(--green);padding:6px 10px;background:rgba(0,212,170,.08);border-radius:8px;margin-bottom:10px;line-height:1.5}
+
+/* ── CHECK ── */
+.ck{width:22px;height:22px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── CHART ── */
+.chart-svg{width:100%;overflow:visible}
+
+/* ── QUICK MEAL GRID ── */
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.qb{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;text-align:left;color:var(--text);transition:border-color .2s;font-family:inherit}
+.qb:hover{border-color:var(--accent)}
+
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="user-toggle">
+      <button class="utb" id="btn-bright" onclick="switchUser('bright')">💪 Bright</button>
+      <button class="utb" id="btn-drishti" onclick="switchUser('drishti')">🌸 Drishti</button>
+    </div>
+  </div>
+
+  <div id="pages">
+    <div class="page" id="page-home"></div>
+    <div class="page" id="page-plan"></div>
+    <div class="page" id="page-log"></div>
+    <div class="page" id="page-progress"></div>
+    <div class="page" id="page-nutrition"></div>
+    <div class="page" id="page-apple"></div>
+  </div>
+
+  <nav id="nav">
+    <button class="nb" onclick="goTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+    </button>
+    <button class="nb" onclick="goTab('plan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Plan
+    </button>
+    <button class="nb" onclick="goTab('log')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Log
+    </button>
+    <button class="nb" onclick="goTab('progress')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>Progress
+    </button>
+    <button class="nb" onclick="goTab('nutrition')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 019 9c0 3.87-2.44 7.17-6 8.48V21H9v-1.52C5.44 18.17 3 14.87 3 11a9 9 0 019-9z"/></svg>Nutrition
+    </button>
+    <button class="nb" onclick="goTab('apple')">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="22" height="22"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>Watch
+    </button>
+  </nav>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const USERS = {
+  bright: { id:'bright', name:'Bright', emoji:'💪', color:'#6c63ff', startWeight:80, height:168, bmr:1730, tdee:2682, kcal:2100, protein:165, carbs:215, fat:65, bmi:28.3, bmiLabel:'Overweight' },
+  drishti:{ id:'drishti',name:'Drishti',emoji:'🌸', color:'#ff6584', startWeight:60, height:157, bmr:1310, tdee:2031, kcal:1600, protein:120, carbs:170, fat:50,  bmi:24.3, bmiLabel:'Normal' }
+};
+
+const PROGRAM = [
+  { day:'Monday',   type:'Upper Body A', icon:'🏋️', tag:'Beginner', tc:'tp', desc:'Chest · Back · Shoulders', dur:55,
+    ex:[
+      {n:'Dumbbell Chest Press (flat bench)', s:3, r:'10', m:'Chest',    tip:'🔰 Lie flat, lower dumbbells to chest level. Safer than barbell — you can drop them if needed'},
+      {n:'Seated Row Machine',               s:3, r:'10', m:'Back',     tip:'🔰 Set the chest pad, grip handles, pull elbows back. Machine guides your path — great for learning the motion'},
+      {n:'Seated Dumbbell Shoulder Press',   s:3, r:'12', m:'Shoulders',tip:'🔰 Sit upright on bench, press straight up. Seated = back support, much safer for beginners'},
+      {n:'Lat Pulldown Machine',             s:3, r:'10', m:'Back',     tip:'🔰 Pull bar to upper chest, lean back slightly. Keep core tight — this machine is perfect for beginners'},
+      {n:'Cable Tricep Pushdown',            s:3, r:'12', m:'Triceps',  tip:'🔰 Elbows stay pinned to sides, only forearms move. Start light and feel the squeeze at the bottom'},
+      {n:'Dumbbell Bicep Curl',              s:3, r:'12', m:'Biceps',   tip:'🔰 Stand tall, curl slowly up and down. Don\'t swing your back — go lighter if you feel it in your lower back'},
+    ], cardio:'12 min Elliptical — easy pace, just get the heart rate up' },
+
+  { day:'Tuesday',  type:'Lower Body A', icon:'🦵', tag:'Beginner', tc:'tp', desc:'Quads · Hamstrings · Glutes', dur:60,
+    ex:[
+      {n:'Leg Press Machine',                s:3, r:'12', m:'Quads/Glutes',  tip:'🔰 Feet shoulder-width on platform, press out fully but don\'t lock knees. Machine supports your back — ideal for beginners'},
+      {n:'Dumbbell Romanian Deadlift',       s:3, r:'10', m:'Hamstrings',    tip:'🔰 Hold dumbbells in front of thighs, hinge at hips until you feel a hamstring stretch. Much easier to control than barbell'},
+      {n:'Goblet Squat',                     s:3, r:'12', m:'Quads/Glutes',  tip:'🔰 Hold ONE dumbbell at chest, squat down. This is the best beginner squat — the weight keeps you balanced'},
+      {n:'Stationary Reverse Lunge',         s:3, r:'10/leg', m:'Quads/Glutes', tip:'🔰 Step BACK (not forward) — much easier for balance. Hold dumbbells at sides. Keep front knee over toes'},
+      {n:'Leg Curl Machine (seated)',        s:3, r:'12', m:'Hamstrings',    tip:'🔰 Adjust so the pad sits just above your ankles. Curl slowly — 2 seconds up, 2 seconds down'},
+      {n:'Standing Calf Raise (machine)',    s:4, r:'15', m:'Calves',        tip:'🔰 Use the calf raise machine or a step. Full stretch down, full rise up. Slow and controlled'},
+    ], cardio:'12 min Stair Climber — slow pace, hold the rails if needed' },
+
+  { day:'Wednesday',type:'Cardio + Core', icon:'🔥', tag:'Cardio',  tc:'tg', desc:'Light Cardio · Core Safety Circuit', dur:45,
+    ex:[
+      {n:'Rowing Machine',                   s:1, r:'8 min',  m:'Full Body', tip:'🔰 Legs push FIRST, then lean back, then pull arms. Most beginners do it backwards. Watch a 1-min YouTube tutorial first'},
+      {n:'Treadmill Walk/Light Jog',         s:1, r:'15 min', m:'Cardio',    tip:'🔰 Walk at 5–6 km/h. If comfortable, jog 1 min then walk 2 min. Don\'t hold the rails — it reduces calorie burn'},
+      {n:'Dead Bug',                         s:3, r:'8/side', m:'Core',      tip:'🔰 Lie on back, arms up, knees bent 90°. Slowly lower opposite arm+leg. Keeps your lower back FLAT — safest core exercise'},
+      {n:'Glute Bridge',                     s:3, r:'15',     m:'Glutes/Core',tip:'🔰 Lie on back, feet flat, push hips up, squeeze glutes at top. Builds core + glutes with zero spine risk'},
+      {n:'Bird Dog',                         s:3, r:'8/side', m:'Back/Core', tip:'🔰 On hands and knees, extend opposite arm + leg. Hold 2 sec. Trains spine stability — great for posture'},
+      {n:'Modified Crunch',                  s:3, r:'12',     m:'Abs',       tip:'🔰 Only lift shoulders off ground, hands behind head loosely. Don\'t pull your neck. Tiny movement, big burn'},
+    ], cardio:null },
+
+  { day:'Thursday', type:'Upper Body B', icon:'💪', tag:'Beginner', tc:'ty', desc:'Back · Chest · Arms', dur:55,
+    ex:[
+      {n:'Incline Dumbbell Press',           s:3, r:'12', m:'Upper Chest',    tip:'🔰 Set bench to 30–45°. Lower dumbbells to upper chest. Safer incline alternative to barbell'},
+      {n:'Lat Pulldown (close grip)',        s:3, r:'10', m:'Back',           tip:'🔰 Use the close-grip attachment today (different feel). Pull to chest, elbows drive down'},
+      {n:'Pec Deck Machine (chest fly)',     s:3, r:'12', m:'Chest',          tip:'🔰 Sit upright, bring arms together in front. Machine keeps the movement safe — great for feeling the chest'},
+      {n:'Resistance Band Face Pull',        s:3, r:'15', m:'Rear Delts/Posture',tip:'🔰 Attach band at face height, pull toward forehead, elbows flare out. BEST exercise for fixing posture — do this every session'},
+      {n:'Dumbbell Hammer Curl',             s:3, r:'12', m:'Biceps/Forearms',tip:'🔰 Palms facing each other (like holding a hammer). Slow and controlled — great for forearm strength too'},
+      {n:'Seated Overhead Dumbbell Tricep',  s:3, r:'12', m:'Triceps',        tip:'🔰 Hold ONE dumbbell overhead with both hands, lower behind head. Sit on bench for back support'},
+    ], cardio:'12 min Spin Bike — easy resistance, steady pace' },
+
+  { day:'Friday',   type:'Lower Body B', icon:'🍑', tag:'Beginner', tc:'ty', desc:'Glutes · Hamstrings · Core', dur:60,
+    ex:[
+      {n:'Dumbbell Romanian Deadlift',       s:4, r:'10', m:'Hamstrings/Glutes',tip:'🔰 This is your safest "deadlift" option. Focus on feeling the hamstring stretch. Go light — form first always'},
+      {n:'Floor Glute Bridge',               s:4, r:'15', m:'Glutes',          tip:'🔰 Lie on floor, feet flat, push hips up, squeeze hard at top for 1 sec. Add a dumbbell on hips when ready'},
+      {n:'Stationary Reverse Lunge',         s:3, r:'10/leg', m:'Quads/Glutes',tip:'🔰 Step BACK again — builds confidence before trying forward lunges. Hold dumbbells or use bodyweight'},
+      {n:'Sumo Goblet Squat',                s:3, r:'12', m:'Inner Thigh/Glutes',tip:'🔰 Wide stance, toes pointed 45° out, hold dumbbell at chest. Feel the inner thigh stretch at the bottom'},
+      {n:'Resistance Band Clamshell',        s:3, r:'15/side', m:'Glutes/Hip',  tip:'🔰 Lie on side, knees bent, band above knees. Open top knee like a clamshell. Builds glutes safely — no back strain'},
+      {n:'Seated Calf Raise (machine)',      s:4, r:'15', m:'Calves',           tip:'🔰 Slow and controlled. Stretch fully at bottom — most people skip this and miss gains'},
+    ], cardio:'10 min Rowing Machine — focus on form not speed' },
+
+  { day:'Saturday', type:'Functional Training',icon:'⚡', tag:'Cardio',  tc:'tg', desc:'Cardio · Functional · Light HIIT', dur:50,
+    ex:[
+      {n:'Battle Ropes (light waves)',       s:4, r:'20s on / 40s rest', m:'Full Body', tip:'🔰 Alternate arms in waves. Keep knees slightly bent, core tight. Short rest — this will get your heart rate up!'},
+      {n:'Box Step-Up',                      s:3, r:'10/leg', m:'Legs/Glutes',  tip:'🔰 Step UP onto the box (not jump). Safer than box jumps for beginners. Push through heel to engage glutes'},
+      {n:'Kettlebell Deadlift',              s:3, r:'12', m:'Posterior Chain',  tip:'🔰 Kettlebell between feet, hinge at hips to pick it up. Learn the HINGE before doing swings — great first step'},
+      {n:'TRX Row',                          s:3, r:'12', m:'Back',             tip:'🔰 Lean back holding TRX handles, pull chest to hands. The more horizontal your body, the harder it is — start easy'},
+      {n:'Jump Rope or March in Place',      s:1, r:'5 min', m:'Cardio',        tip:'🔰 If jump rope is tricky, just march in place lifting knees high. Same cardio benefit while you learn the rope'},
+      {n:'Treadmill Walk',                   s:1, r:'15 min', m:'Cardio',       tip:'🔰 Cool down — incline at 3–5%, steady walk. Burns fat and lets your heart rate come down gradually'},
+    ], cardio:null },
+
+  { day:'Sunday',   type:'Rest & Recovery',icon:'😴', tag:'Rest',    tc:'tg', desc:'Recovery · Mobility · Stretch', dur:30,
+    ex:[
+      {n:'Light Walk (outdoors)',            s:1, r:'20–30 min', m:'Active Recovery',tip:'Fresh air + movement = best recovery combo. Easy pace — no tracking needed today'},
+      {n:'Full Body Stretch',                s:1, r:'15 min',    m:'Flexibility',    tip:'Hip flexors, chest, hamstrings, shoulders. Hold each 30 sec. YouTube "beginner stretch routine" for guidance'},
+      {n:'Foam Rolling',                     s:1, r:'10 min',    m:'Recovery',       tip:'Legs, back, glutes. Slow roll — when you hit a tight spot, pause and breathe through it'},
+    ], cardio:null }
+];
+
+const QUICK_MEALS = [
+  {n:'Chicken Breast (150g)', kcal:248, p:46, c:0,  f:5},
+  {n:'Brown Rice (1 cup)',    kcal:216, p:5,  c:45, f:2},
+  {n:'3 Eggs',               kcal:234, p:18, c:2,  f:16},
+  {n:'Greek Yogurt (200g)',   kcal:130, p:17, c:9,  f:2},
+  {n:'Oats 80g dry',         kcal:303, p:11, c:51, f:6},
+  {n:'Salmon (150g)',        kcal:280, p:39, c:0,  f:13},
+  {n:'Sweet Potato (med)',   kcal:103, p:2,  c:24, f:0},
+  {n:'Protein Shake',        kcal:130, p:25, c:5,  f:3},
+  {n:'Banana',               kcal:89,  p:1,  c:23, f:0},
+  {n:'Mixed Nuts (30g)',     kcal:185, p:5,  c:6,  f:16},
+];
+
+// Day index → program index (Sun=6=Rest, Mon=0, Tue=1, ...)
+const DAYPROG = [6,0,1,2,3,4,5];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentUser = ls('fc_user') || 'bright';
+let currentTab  = 'home';
+let logState    = {}; // per-session workout log state
+
+function ls(k){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null }catch{return null} }
+function ss(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch{} }
+function getLogs(){ return ls('fc_logs') || {} }
+function getWeights(){ return ls('fc_weights') || {} }
+function getNutrition(){ return ls('fc_nutrition') || {} }
+function today(){ return new Date().toDateString() }
+function todayPlanIdx(){ return DAYPROG[new Date().getDay()] }
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function el(id){ return document.getElementById(id) }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function ring(val,max,size,stroke,color){
+  const r=(size-stroke)/2, circ=2*Math.PI*r, pct=Math.min(val/max,1);
+  const off=circ*(1-pct);
+  return `<svg width="${size}" height="${size}" style="transform:rotate(-90deg)">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#1c1c26" stroke-width="${stroke}"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+      stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+  </svg>`;
+}
+function macroBar(val,max,color){
+  const pct=Math.min(Math.round((val/max)*100),100);
+  return `<div class="mbg"><div class="mbf" style="width:${pct}%;background:${color}"></div></div>`;
+}
+function progressBar(val,max,color){
+  const pct=Math.min(Math.round((val/max)*100),100);
+  return `<div class="pb-wrap"><div class="pb-fill" style="width:${pct}%;background:${color}"></div></div>`;
+}
+
+function getUserNutritionToday(uid){
+  const nutr=getNutrition();
+  return (nutr[uid]||[]).find(n=>n.date===today()) || {kcal:0,protein:0,carbs:0,fat:0,meals:[]};
+}
+function getStreak(uid){
+  const logs=getLogs()[uid]||[];
+  const now=new Date();
+  return logs.filter(l=>{ const d=new Date(l.date); return Math.floor((now-d)/86400000)<=7 && l.exercises?.length>0 }).length;
+}
+
+// ── SWITCH USER ───────────────────────────────────────────────────────────────
+function switchUser(uid){
+  currentUser=uid; ss('fc_user',uid);
+  el('btn-bright').className='utb'+(uid==='bright'?' ab':'');
+  el('btn-drishti').className='utb'+(uid==='drishti'?' ad':'');
+  // Update nav active color via CSS variable
+  document.documentElement.style.setProperty('--accent', USERS[uid].color);
+  renderTab(currentTab);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function goTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  el('page-'+tab).classList.add('on');
+  const tabs=['home','plan','log','progress','nutrition','apple'];
+  document.querySelectorAll('.nb')[tabs.indexOf(tab)].classList.add('on');
+  renderTab(tab);
+}
+function renderTab(tab){
+  if(tab==='home')      renderHome();
+  if(tab==='plan')      renderPlan();
+  if(tab==='log')       renderLog();
+  if(tab==='progress')  renderProgress();
+  if(tab==='nutrition') renderNutrition();
+  if(tab==='apple')     renderApple();
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome(){
+  const u=USERS[currentUser], p=USERS[currentUser==='bright'?'drishti':'bright'];
+  const tn=getUserNutritionToday(currentUser), pn=getUserNutritionToday(p.id);
+  const logs=getLogs();
+  const todayLogged=!!(logs[currentUser]||[]).find(l=>l.date===today());
+  const partnerLogged=!!(logs[p.id]||[]).find(l=>l.date===today());
+  const plan=PROGRAM[todayPlanIdx()];
+  const kcalPct=Math.round((tn.kcal/u.kcal)*100);
+  const streak=getStreak(currentUser);
+  const totalW=(logs[currentUser]||[]).length;
+  const deficit=u.tdee-u.kcal;
+  const weekLoss=Math.round((deficit/7700*7)*10)/10;
+
+  const h=new Date().getHours();
+  const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+
+  el('page-home').innerHTML=`
+  <h1 style="color:${u.color};margin-top:2px">${u.emoji} ${u.name}</h1>
+  <div class="muted" style="margin-bottom:6px">${greet}! Let's crush it today 🔥</div>
+  <span class="ph">🚀 Phase 1: Fat Loss</span>
+
+  <!-- Today's workout -->
+  <div class="card ca" style="border-color:${u.color}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="lbl">Today's Workout</div>
+        <div style="font-size:20px;font-weight:900;margin-top:4px">${plan.icon} ${plan.type}</div>
+        <div class="muted" style="margin-top:2px">${plan.desc}</div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+          <span class="tag ${plan.tc}">${plan.tag}</span>
+          <span class="tag tp">⏱ ${plan.dur} min</span>
+          <span class="tag ty">📍 Anytime Fitness</span>
+        </div>
+      </div>
+      ${todayLogged?`<div class="ck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></div>`:''}
+    </div>
+    <div style="margin-top:12px;font-size:13px;color:var(--muted)">
+      ${plan.ex.slice(0,3).map(e=>`<div style="margin-bottom:2px">• ${e.n} — ${e.s}×${e.r}</div>`).join('')}
+      ${plan.ex.length>3?`<div>+ ${plan.ex.length-3} more exercises</div>`:''}
+    </div>
+  </div>
+
+  <!-- Calories -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0">Today's Nutrition</h2>
+      <span class="muted" style="font-size:12px">${tn.kcal} / ${u.kcal} kcal</span>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <div class="ring-wrap" style="width:90px;height:90px">
+        ${ring(tn.kcal,u.kcal,90,8,u.color)}
+        <div class="ring-inner">
+          <div style="font-size:15px;font-weight:900">${kcalPct}%</div>
+          <div style="font-size:10px;color:var(--muted)">kcal</div>
+        </div>
+      </div>
+      <div style="flex:1">
+        ${[['Protein',tn.protein,u.protein,'#6c63ff'],['Carbs',tn.carbs,u.carbs,'#ffd166'],['Fat',tn.fat,u.fat,'#ff6584']].map(([lbl,v,t,c])=>`
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--muted)">${lbl}</span>
+            <span style="font-weight:600">${v}g <span style="color:var(--muted)">/ ${t}g</span></span>
+          </div>
+          ${macroBar(v,t,c)}
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Couple -->
+  <h2>Couple Snapshot 💑</h2>
+  <div class="card">
+    <div class="cc2">
+      ${[{uid:currentUser,nu:tn,logged:todayLogged},{uid:p.id,nu:pn,logged:partnerLogged}].map(({uid,nu,logged})=>{
+        const uu=USERS[uid];
+        return `<div class="ccu" style="border:1px solid ${uu.color}33">
+          <div style="font-size:13px;font-weight:700;color:${uu.color}">${uu.emoji} ${uu.name}</div>
+          <div style="font-size:22px;font-weight:900;margin-top:4px">${nu.kcal}</div>
+          <div class="muted" style="font-size:11px">kcal today</div>
+          <div style="margin-top:6px">${logged?'<span class="tag tg">✓ Trained</span>':'<span class="tag tm">Rest</span>'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${[{lbl:u.name,val:tn.kcal,max:u.kcal,col:u.color},{lbl:p.name,val:pn.kcal,max:p.kcal,col:p.color}].map(b=>`
+    <div class="cbar">
+      <div class="clbl">${b.lbl}</div>
+      <div class="cbw"><div class="cbf" style="width:${Math.min(Math.round((b.val/b.max)*100),100)}%;background:${b.col}"></div></div>
+      <div style="font-size:11px;width:32px;text-align:right;color:var(--muted)">${Math.round((b.val/b.max)*100)}%</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Stats -->
+  <div class="sg">
+    <div class="sc"><div style="font-size:26px">🔥</div><div class="big">${streak}</div><div class="lbl">Day Streak</div></div>
+    <div class="sc"><div style="font-size:26px">💪</div><div class="big">${totalW}</div><div class="lbl">Workouts</div></div>
+    <div class="sc"><div style="font-size:26px">⚖️</div><div class="big" style="font-size:22px">${u.bmi}</div><div class="lbl">BMI · ${u.bmiLabel}</div></div>
+    <div class="sc"><div style="font-size:26px">🎯</div><div class="big" style="font-size:20px">${u.kcal}</div><div class="lbl">Daily kcal</div></div>
+  </div>
+
+  <!-- Science card -->
+  <div class="card cg">
+    <div style="font-weight:700;margin-bottom:6px">📊 Your Science</div>
+    <div style="font-size:12px;line-height:1.8;color:var(--muted)">
+      BMR <b style="color:var(--text)">${u.bmr}</b> kcal → TDEE <b style="color:var(--text)">${u.tdee}</b> kcal → Target <b style="color:${u.color}">${u.kcal}</b> kcal<br>
+      Deficit: <b style="color:var(--text)">${deficit}</b> kcal/day → Est. loss: <b style="color:var(--green)">~${weekLoss} kg/week</b>
+    </div>
+  </div>`;
+}
+
+// ── PLAN ──────────────────────────────────────────────────────────────────────
+function renderPlan(){
+  const u=USERS[currentUser];
+  const todayDow=new Date().getDay();
+  const todayProgIdx=DAYPROG[todayDow];
+
+  el('page-plan').innerHTML=`
+  <h1 style="margin-top:2px">Weekly Plan 📅</h1>
+  <div class="muted" style="margin-bottom:12px">Phase 1 · Fat Loss + Strength</div>
+
+  <div class="card" style="border-color:${u.color};margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;color:${u.color};margin-bottom:8px">🎯 ${u.name}'s Daily Targets</div>
+    <div style="display:flex;justify-content:space-around;text-align:center">
+      ${[[u.kcal+' kcal','Calories',u.color],[u.protein+'g','Protein','#6c63ff'],[u.carbs+'g','Carbs','#ffd166'],[u.fat+'g','Fat','#ff6584']].map(([v,l,c])=>`
+      <div><div style="font-size:15px;font-weight:800;color:${c}">${v}</div><div class="lbl" style="font-size:9px">${l}</div></div>`).join('')}
+    </div>
+  </div>
+
+  ${PROGRAM.map((plan,i)=>{
+    const isToday=todayProgIdx===i;
+    const isRest=plan.type==='Rest & Recovery';
+    return `<div class="dc ${isToday?'today':''} ${isRest?'rest':''}" onclick="togglePlanDay(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:24px">${plan.icon}</div>
+          <div>
+            <div style="font-weight:700;font-size:14px">${plan.day}</div>
+            <div class="muted" style="font-size:12px">${plan.type}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${isToday?'<span class="tag tp">Today</span>':''}
+          <span class="tag ${plan.tc}">${plan.tag}</span>
+          <span style="color:var(--muted);font-size:18px" id="arr-${i}">▼</span>
+        </div>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:4px">${plan.desc} · ⏱ ${plan.dur} min · ${plan.ex.length} exercises</div>
+      <div class="dc-body" id="dcb-${i}">
+        ${plan.ex.map((ex,j)=>`
+        <div class="ex-row">
+          <div class="exn" style="background:${isRest?'var(--green)':u.color}">${j+1}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${esc(ex.n)}</div>
+            <div class="muted" style="font-size:12px">${ex.s} sets × ${ex.r} · ${ex.m}</div>
+            <div style="font-size:11px;color:var(--green);margin-top:2px">💡 ${esc(ex.tip)}</div>
+          </div>
+        </div>`).join('')}
+        ${plan.cardio?`<div style="margin-top:8px;padding:8px 12px;background:rgba(0,212,170,.1);border-radius:8px;font-size:12px">🏃 <b>Cardio Finisher:</b> ${plan.cardio}</div>`:''}
+      </div>
+    </div>`;
+  }).join('')}`;
+}
+
+function togglePlanDay(i){
+  const body=el('dcb-'+i), arr=el('arr-'+i);
+  const open=body.classList.toggle('open');
+  arr.textContent=open?'▲':'▼';
+}
+
+// ── LOG ───────────────────────────────────────────────────────────────────────
+function renderLog(){
+  const u=USERS[currentUser];
+  const plan=PROGRAM[todayPlanIdx()];
+  const key='fc_logstate_'+currentUser+'_'+today();
+  if(!logState[key]){
+    logState[key]=plan.ex.map(ex=>({
+      name:ex.n, muscle:ex.m, tip:ex.tip,
+      sets:Array(ex.s).fill(null).map(()=>({reps:'',weight:''})),
+      done:false, open:false
+    }));
+  }
+  const exs=logState[key];
+  const done=exs.filter(e=>e.done).length;
+
+  el('page-log').innerHTML=`
+  <h1 style="margin-top:2px">${plan.icon} ${plan.type}</h1>
+  <div class="muted" style="margin-bottom:8px">${plan.desc} · ${plan.dur} min</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+    ${progressBar(done,exs.length,u.color)}
+    <span class="muted" style="font-size:12px;white-space:nowrap">${done}/${exs.length}</span>
+  </div>
+
+  ${exs.map((ex,i)=>`
+  <div class="card" style="border-color:${ex.done?'var(--green)':u.color+'44'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleLogEx(${i})">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="exn" style="background:${ex.done?'var(--green)':u.color}">${i+1}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">${esc(ex.name)}</div>
+          <div class="muted" style="font-size:12px">${ex.muscle}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn bo bsm ${ex.done?'bgo':''}" onclick="event.stopPropagation();markDone(${i})">${ex.done?'✓ Done':'Mark Done'}</button>
+        <span style="color:var(--muted)">${ex.open?'▲':'▼'}</span>
+      </div>
+    </div>
+    ${ex.open?`
+    <div style="margin-top:12px">
+      <div class="tipbox">💡 ${esc(ex.tip)}</div>
+      <table class="set-tbl">
+        <tr><th>SET</th><th>REPS</th><th>KG</th><th></th></tr>
+        ${ex.sets.map((s,j)=>`<tr>
+          <td style="color:var(--muted);font-weight:700">${j+1}</td>
+          <td><input class="si" type="number" placeholder="reps" value="${esc(s.reps)}" oninput="updateSet(${i},${j},'reps',this.value)"></td>
+          <td><input class="si" type="number" placeholder="kg" value="${esc(s.weight)}" oninput="updateSet(${i},${j},'weight',this.value)"></td>
+          <td><button class="btn brd bsm" onclick="removeSet(${i},${j})" style="padding:5px 8px">✕</button></td>
+        </tr>`).join('')}
+      </table>
+      <button class="btn bo bsm" onclick="addSet(${i})" style="width:100%;margin-top:4px">+ Add Set</button>
+    </div>`:''}
+  </div>`).join('')}
+
+  ${plan.cardio?`<div class="card cg"><div style="font-weight:700">🏃 Cardio Finisher</div><div class="muted" style="margin-top:4px">${plan.cardio}</div></div>`:''}
+
+  <button class="btn bp" style="background:${u.color}" onclick="saveWorkout()">
+    ${ls('fc_wlog_'+currentUser+'_'+today())?'✓ Workout Saved — Update':'Save Workout 💾'}
+  </button>`;
+}
+
+function toggleLogEx(i){
+  const u=currentUser, key='fc_logstate_'+u+'_'+today();
+  logState[key][i].open=!logState[key][i].open;
+  renderLog();
+}
+function markDone(i){
+  const key='fc_logstate_'+currentUser+'_'+today();
+  logState[key][i].done=!logState[key][i].done;
+  renderLog();
+}
+function updateSet(exIdx,setIdx,field,val){
+  const key='fc_logstate_'+currentUser+'_'+today();
+  logState[key][exIdx].sets[setIdx][field]=val;
+}
+function addSet(exIdx){
+  const key='fc_logstate_'+currentUser+'_'+today();
+  logState[key][exIdx].sets.push({reps:'',weight:''});
+  renderLog();
+}
+function removeSet(exIdx,setIdx){
+  const key='fc_logstate_'+currentUser+'_'+today();
+  logState[key][exIdx].sets.splice(setIdx,1);
+  renderLog();
+}
+function saveWorkout(){
+  const key='fc_logstate_'+currentUser+'_'+today();
+  const exs=logState[key];
+  const logs=getLogs();
+  const entry={date:today(),programIdx:todayPlanIdx(),exercises:exs,savedAt:new Date().toISOString()};
+  const userLogs=(logs[currentUser]||[]).filter(l=>l.date!==today());
+  logs[currentUser]=[...userLogs,entry];
+  ss('fc_logs',logs);
+  ss('fc_wlog_'+currentUser+'_'+today(),true);
+  renderLog();
+}
+
+// ── PROGRESS ─────────────────────────────────────────────────────────────────
+function renderProgress(){
+  const u=USERS[currentUser];
+  const weights=getWeights()[currentUser]||[{date:today(),weight:u.startWeight}];
+  const logs=getLogs();
+  const totalW=(logs[currentUser]||[]).length;
+  const curr=weights[weights.length-1]?.weight||u.startWeight;
+  const change=(curr-u.startWeight).toFixed(1);
+  const changeNum=parseFloat(change);
+  const changeColor=changeNum<0?'var(--green)':changeNum>0?'var(--pink)':'var(--text)';
+
+  // SVG mini-chart
+  let chartSvg='';
+  if(weights.length>1){
+    const vals=weights.slice(-12).map(w=>w.weight);
+    const mn=Math.min(...vals)-1, mx=Math.max(...vals)+1;
+    const W=340, H=100;
+    const pts=vals.map((v,i)=>{
+      const x=20+(i/(vals.length-1))*(W-40);
+      const y=H-10-((v-mn)/(mx-mn))*(H-20);
+      return `${x},${y}`;
+    });
+    chartSvg=`<div class="card">
+      <h2>Weight Trend</h2>
+      <svg viewBox="0 0 ${W} ${H}" class="chart-svg">
+        <polyline points="${pts.join(' ')}" fill="none" stroke="${u.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        ${vals.map((v,i)=>{
+          const x=20+(i/(vals.length-1))*(W-40);
+          const y=H-10-((v-mn)/(mx-mn))*(H-20);
+          return `<circle cx="${x}" cy="${y}" r="4" fill="${u.color}"/><text x="${x}" y="${y-8}" text-anchor="middle" font-size="9" fill="var(--muted)">${v}</text>`;
+        }).join('')}
+        <text x="20" y="${H}" text-anchor="middle" font-size="9" fill="var(--muted)">Start</text>
+        <text x="${W-20}" y="${H}" text-anchor="end" font-size="9" fill="var(--muted)">Now</text>
+      </svg>
+    </div>`;
+  }
+
+  el('page-progress').innerHTML=`
+  <h1 style="margin-top:2px">Progress 📈</h1>
+  <div class="muted" style="margin-bottom:14px">Track your transformation</div>
+
+  <div class="sg">
+    <div class="sc" style="border:1px solid ${u.color}44"><div class="lbl">Start Weight</div><div class="big" style="font-size:22px">${u.startWeight}<span style="font-size:13px">kg</span></div></div>
+    <div class="sc" style="border:1px solid ${u.color}44"><div class="lbl">Current</div><div class="big" style="font-size:22px;color:${u.color}">${curr}<span style="font-size:13px">kg</span></div></div>
+    <div class="sc"><div class="lbl">Change</div><div class="big" style="font-size:22px;color:${changeColor}">${changeNum>0?'+':''}${change}<span style="font-size:13px">kg</span></div></div>
+    <div class="sc"><div class="lbl">Workouts</div><div class="big">${totalW}</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Log Today's Weight</h2>
+    <div style="display:flex;gap:8px">
+      <input class="inp" type="number" id="wt-inp" placeholder="e.g. 79.5" step="0.1" style="margin:0;flex:1">
+      <button class="btn bp bsm" style="background:${u.color};padding:10px 18px" onclick="logWeight()">Log</button>
+    </div>
+  </div>
+
+  ${chartSvg}
+
+  <div class="card">
+    <h2>Workout History</h2>
+    ${(logs[currentUser]||[]).slice().reverse().slice(0,8).map(log=>{
+      const plan=PROGRAM[log.programIdx]||{icon:'💪',type:'Workout'};
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:24px">${plan.icon}</div>
+        <div style="flex:1"><div style="font-weight:600;font-size:14px">${plan.type}</div><div class="muted" style="font-size:12px">${log.date}</div></div>
+        <span class="tag tg">Done ✓</span>
+      </div>`;
+    }).join('')}
+    ${!(logs[currentUser]||[]).length?'<div class="muted" style="text-align:center;padding:20px">No workouts yet.<br>Head to the Log tab! 💪</div>':''}
+  </div>
+
+  <div class="card ca">
+    <div style="font-weight:700;margin-bottom:8px">🗓 Goal Timeline</div>
+    <div style="font-size:12px;line-height:1.9;color:var(--muted)">
+      <div>📍 <b style="color:var(--text)">Now (Week 1–2):</b> Build the habit, learn movements</div>
+      <div>🔥 <b style="color:var(--text)">Weeks 4–8:</b> Fat loss accelerates — est. –${Math.round(((u.tdee-u.kcal)/7700*4)*10)/10}–${Math.round(((u.tdee-u.kcal)/7700*8)*10)/10}kg total</div>
+      <div>💪 <b style="color:var(--text)">Weeks 8–12:</b> Strength gains visible, muscle building begins</div>
+      <div>🏆 <b style="color:var(--text)">Week 12+:</b> Phase 2 — Lean Bulk, higher kcal target</div>
+    </div>
+  </div>`;
+}
+
+function logWeight(){
+  const inp=el('wt-inp');
+  const w=parseFloat(inp.value);
+  if(!w||w<30||w>250){inp.style.borderColor='var(--pink)';return}
+  inp.style.borderColor='';
+  const weights=getWeights();
+  const entry={date:today(),weight:w};
+  const userW=weights[currentUser]||[];
+  const idx=userW.findIndex(l=>l.date===today());
+  if(idx>=0) userW[idx]=entry; else userW.push(entry);
+  weights[currentUser]=userW;
+  ss('fc_weights',weights);
+  inp.value='';
+  renderProgress();
+}
+
+// ── NUTRITION ─────────────────────────────────────────────────────────────────
+function renderNutrition(){
+  const u=USERS[currentUser];
+  const tn=getUserNutritionToday(currentUser);
+  const rem=u.kcal-tn.kcal;
+  const remColor=rem>=0?'var(--green)':'var(--pink)';
+  const d=new Date().toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'});
+
+  el('page-nutrition').innerHTML=`
+  <h1 style="margin-top:2px">Nutrition 🥗</h1>
+  <div class="muted" style="margin-bottom:14px">${d}</div>
+
+  <div class="card" style="border-color:${u.color}">
+    <div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:16px">
+      <div><div style="font-size:26px;font-weight:900;color:${u.color}">${tn.kcal}</div><div class="lbl">Eaten</div></div>
+      <div style="display:flex;align-items:center;color:var(--muted);font-size:22px">–</div>
+      <div><div style="font-size:26px;font-weight:900">${u.kcal}</div><div class="lbl">Target</div></div>
+      <div style="display:flex;align-items:center;color:var(--muted);font-size:22px">=</div>
+      <div><div style="font-size:26px;font-weight:900;color:${remColor}">${Math.abs(rem)}</div><div class="lbl">${rem>=0?'Left':'Over'}</div></div>
+    </div>
+    ${[['Protein',tn.protein,u.protein,'#6c63ff'],['Carbs',tn.carbs,u.carbs,'#ffd166'],['Fat',tn.fat,u.fat,'#ff6584']].map(([lbl,v,t,c])=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span style="font-weight:600;color:${c}">${lbl}</span>
+        <span class="muted">${v}g / ${t}g</span>
+      </div>
+      ${macroBar(v,t,c)}
+    </div>`).join('')}
+  </div>
+
+  <h2>Quick Add 🚀</h2>
+  <div class="qg">
+    ${QUICK_MEALS.map((m,i)=>`
+    <button class="qb" onclick="quickAddMeal(${i})">
+      <div style="font-size:13px;font-weight:600;margin-bottom:3px">${esc(m.n)}</div>
+      <div style="font-size:11px;color:var(--muted)">${m.kcal} kcal · ${m.p}g P</div>
+    </button>`).join('')}
+  </div>
+
+  <button class="btn bp" style="background:${u.color};margin-bottom:12px" onclick="toggleCustomForm()">+ Custom Meal</button>
+  <div id="custom-form" style="display:none">
+    <div class="card">
+      <h2>Custom Meal</h2>
+      <input class="inp" id="mn" placeholder="Meal name">
+      <div class="grid2">
+        <input class="inp" id="mc" type="number" placeholder="Calories">
+        <input class="inp" id="mp" type="number" placeholder="Protein (g)">
+        <input class="inp" id="mca" type="number" placeholder="Carbs (g)">
+        <input class="inp" id="mf" type="number" placeholder="Fat (g)">
+      </div>
+      <button class="btn bp" style="background:${u.color}" onclick="addCustomMeal()">Add Meal</button>
+    </div>
+  </div>
+
+  ${(tn.meals||[]).length?`
+  <div class="card">
+    <h2>Today's Meals</h2>
+    ${(tn.meals||[]).map(m=>`
+    <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-weight:600;font-size:14px">${esc(m.n)}</div>
+        <div class="muted" style="font-size:11px">P: ${m.p}g · C: ${m.c}g · F: ${m.f}g</div>
+      </div>
+      <div style="font-weight:800;color:${u.color}">${m.kcal}</div>
+    </div>`).join('')}
+  </div>`:''}
+
+  <div class="card ca">
+    <div style="font-weight:700;margin-bottom:8px">🕐 Smart Meal Timing</div>
+    <div style="font-size:12px;line-height:1.9;color:var(--muted)">
+      <div>🌅 <b style="color:var(--text)">Pre-Workout (+1–2h):</b> Oats + banana + protein shake</div>
+      <div>💪 <b style="color:var(--text)">Post-Workout (30 min):</b> Protein shake + fruit</div>
+      <div>🍽 <b style="color:var(--text)">Protein every 3–4h:</b> Spread intake for muscle retention</div>
+      <div>💧 <b style="color:var(--text)">Water:</b> 3L/day (Bright) · 2.5L/day (Drishti)</div>
+    </div>
+  </div>`;
+}
+
+function toggleCustomForm(){
+  const f=el('custom-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+function addNutritionEntry(meal){
+  const nutr=getNutrition();
+  const userN=nutr[currentUser]||[];
+  const idx=userN.findIndex(n=>n.date===today());
+  if(idx>=0){
+    userN[idx]={...userN[idx],
+      kcal:(userN[idx].kcal||0)+meal.kcal,
+      protein:(userN[idx].protein||0)+meal.p,
+      carbs:(userN[idx].carbs||0)+meal.c,
+      fat:(userN[idx].fat||0)+meal.f,
+      meals:[...(userN[idx].meals||[]),meal]
+    };
+  } else {
+    userN.push({date:today(),kcal:meal.kcal,protein:meal.p,carbs:meal.c,fat:meal.f,meals:[meal]});
+  }
+  nutr[currentUser]=userN;
+  ss('fc_nutrition',nutr);
+  renderNutrition();
+  if(currentTab==='home') renderHome();
+}
+
+function quickAddMeal(i){
+  addNutritionEntry(QUICK_MEALS[i]);
+}
+
+function addCustomMeal(){
+  const n=el('mn')?.value?.trim();
+  const kcal=parseInt(el('mc')?.value)||0;
+  const p=parseInt(el('mp')?.value)||0;
+  const c=parseInt(el('mca')?.value)||0;
+  const f=parseInt(el('mf')?.value)||0;
+  if(!n||!kcal) return;
+  addNutritionEntry({n,kcal,p,c,f});
+}
+
+// ── APPLE WATCH ───────────────────────────────────────────────────────────────
+function renderApple(){
+  const u=USERS[currentUser];
+  const plan=PROGRAM[todayPlanIdx()];
+  const workoutType=plan.tag==='Cardio'?'High Intensity Interval Training':'Traditional Strength Training';
+
+  el('page-apple').innerHTML=`
+  <h1 style="margin-top:2px">Apple Watch 🍎</h1>
+  <div class="muted" style="margin-bottom:14px">Sync your workouts to Apple Health</div>
+
+  <!-- How it works -->
+  <div class="card ca">
+    <div style="font-weight:700;margin-bottom:8px">How the bridge works</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--muted)">
+      Your web app <b style="color:var(--text)">+</b> Apple Watch work together as a team:<br>
+      <b style="color:${u.color}">This app</b> = your workout plan, logs, nutrition & progress<br>
+      <b style="color:var(--text)">Apple Watch</b> = heart rate, calories burned, ring closing<br>
+      <b style="color:var(--green)">Shortcut</b> = logs the workout into Apple Health automatically
+    </div>
+  </div>
+
+  <!-- Step 1: During workout -->
+  <div class="card">
+    <div style="font-size:16px;font-weight:800;margin-bottom:10px">Step 1 — At the Gym</div>
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+      <div>
+        <div style="font-weight:600">Raise your wrist on Apple Watch</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">Open the <b style="color:var(--text)">Workout</b> app (green icon)</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+      <div>
+        <div style="font-weight:600">Select the right workout type</div>
+        <div style="background:var(--surface2);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:12px">
+          ${PROGRAM.map((p,i)=>`<div style="padding:3px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+            <span>${p.icon} ${p.day}: <b style="color:var(--text)">${p.type}</b></span>
+            <span class="muted">${p.tag==='Cardio'?'HIIT / Cardio':'Functional Strength'}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+      <div>
+        <div style="font-weight:600">Tap the orange button to start</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">Watch tracks your heart rate, calories & duration automatically</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Log Workout Shortcut -->
+  <div class="card cg">
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Step 2 — Build your "Log Workout" Shortcut</div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">One-time setup · Takes 3 minutes · Works from Watch & iPhone</div>
+
+    ${[
+      {n:'Open Shortcuts app on iPhone', d:'Search "Shortcuts" in your app library'},
+      {n:'Tap + (top right) to create new', d:'This opens the shortcut builder'},
+      {n:'Tap "Add Action"', d:'Search for "Log Health Sample"'},
+      {n:'Set Type to "Workout"', d:'Tap the blue "Workout" pill → pick type'},
+      {n:'Set Workout type = "Traditional Strength Training"', d:'For Bright — change to "HIIT" for cardio days'},
+      {n:'Set Duration = "Ask Each Time"', d:'So you can enter how long you worked out'},
+      {n:'Set Active Calories = "Ask Each Time"', d:'You\'ll enter this after your session'},
+      {n:'Tap "Add Action" again → "Show Result"', d:'Confirms it worked'},
+      {n:'Name the shortcut "Log Gym Workout"', d:'Tap the shortcut name at top to rename'},
+      {n:'Add to Watch: Settings → Siri & Search → toggle shortcut', d:'Then it appears on your Watch\'s Siri watch face'},
+    ].map((s,i)=>`
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+      <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#000;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+      <div>
+        <div style="font-weight:600;font-size:13px">${s.n}</div>
+        <div class="muted" style="font-size:11px">${s.d}</div>
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Step 3: Log Weight Shortcut -->
+  <div class="card cp">
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Step 3 — Build "Log My Weight" Shortcut</div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">Log your morning weight to Apple Health in 2 taps</div>
+
+    ${[
+      {n:'Create a new Shortcut', d:'Tap + in the Shortcuts app'},
+      {n:'Add Action → "Log Health Sample"', d:'Same as before'},
+      {n:'Set Type = "Body Mass"', d:'This logs body weight to Health'},
+      {n:'Set Value = "Ask Each Time"', d:'You\'ll type your weight in kg each morning'},
+      {n:'Set Unit = "kg"', d:'Tap the unit field and select kilograms'},
+      {n:'Name it "Log My Weight"', d:'Add to Watch via Settings → Siri same as above'},
+    ].map((s,i)=>`
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+      <div style="width:24px;height:24px;border-radius:50%;background:var(--pink);color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+      <div>
+        <div style="font-weight:600;font-size:13px">${s.n}</div>
+        <div class="muted" style="font-size:11px">${s.d}</div>
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Daily routine -->
+  <div class="card">
+    <div style="font-size:16px;font-weight:800;margin-bottom:10px">Your Daily Routine 🗓</div>
+    ${[
+      {time:'Morning', icon:'🌅', steps:['Weigh yourself → run "Log My Weight" shortcut','Open this app → check today\'s workout plan','Eat breakfast (check Nutrition tab for targets)']},
+      {time:'At Gym', icon:'🏋️', steps:['Apple Watch → Workout app → start session','Open this app → Log tab → log your sets & reps','Watch tracks heart rate & calories automatically']},
+      {time:'After Gym', icon:'✅', steps:['End workout on Apple Watch (double-side-button)','Run "Log Gym Workout" shortcut → enter duration + calories','Tap "Save Workout" in this app\'s Log tab']},
+      {time:'Evening', icon:'🌙', steps:['Log your meals in Nutrition tab','Check Apple Health app — all rings should close','View your couple progress in Home tab']},
+    ].map(r=>`
+    <div style="margin-bottom:14px">
+      <div style="font-weight:700;color:${u.color};margin-bottom:6px">${r.icon} ${r.time}</div>
+      ${r.steps.map(s=>`<div style="display:flex;gap:8px;font-size:13px;margin-bottom:4px"><span style="color:var(--green)">→</span><span class="muted">${s}</span></div>`).join('')}
+    </div>`).join('')}
+  </div>
+
+  <!-- Ring targets -->
+  <div class="card ca">
+    <div style="font-weight:700;margin-bottom:8px">🎯 Suggested Apple Watch Ring Targets</div>
+    <div style="font-size:12px;line-height:1.9">
+      <div style="display:flex;justify-content:space-between"><span class="muted">🔴 Move (Active Calories)</span> <b style="color:var(--pink)">Bright: 600 · Drishti: 450</b></div>
+      <div style="display:flex;justify-content:space-between"><span class="muted">💚 Exercise Minutes</span> <b style="color:var(--green)">30 min/day</b></div>
+      <div style="display:flex;justify-content:space-between"><span class="muted">🔵 Stand Hours</span> <b style="color:var(--accent)">12 hours</b></div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--muted)">To change: Apple Watch app on iPhone → My Watch → Activity → Change Goals</div>
+  </div>
+
+  <!-- Today's watch suggestion -->
+  <div class="card" style="border-color:${u.color}">
+    <div style="font-weight:700;margin-bottom:6px">📱 Today's Watch Setup</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--muted)">
+      Today is <b style="color:var(--text)">${plan.day} — ${plan.type}</b><br>
+      Select on Watch: <b style="color:${u.color}">${workoutType}</b><br>
+      Expected duration: <b style="color:var(--text)">${plan.dur} minutes</b><br>
+      Est. calories burned: <b style="color:var(--green)">${currentUser==='bright'?Math.round(plan.dur*7):Math.round(plan.dur*5.5)} kcal</b>
+    </div>
+  </div>`;
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+switchUser(currentUser);
+goTab('home');
+</script>
+</body>
+</html>

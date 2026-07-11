@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "skills": {
+    "app-ui-design": {
+      "source": "majiayu000/claude-arsenal",
+      "sourceType": "github",
+      "skillPath": "skills/app-ui-design/SKILL.md",
+      "computedHash": "50d70ba214d76c60660c02ebcadb54b8e820c7dfbc9b68fb3f81c6695e5a266f"
+    },
+    "apple-health-analyst": {
+      "source": "ruochenlyu/apple-health-analyst",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/apple-health-analyst/SKILL.md",
+      "computedHash": "19648897d672a0e70e45eafadd6f64d618af5466eebe2cdd7574d2445d54bd82"
+    },
+    "apple-health-skill": {
+      "source": "nftechie/apple-health-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "d6a8066629aed6523a51f8bdb268912d343cdcad0212b57c1a2a9121600caed9"
+    },
+    "design-guide": {
+      "source": "getpaperclipai/paperclip",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/design-guide/SKILL.md",
+      "computedHash": "d509c92a264397f32788f4a005c2bc8a1cbd874aa3037d76ede7ee3fb1c22ab6"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "781bd6d3f9b19f8c9af6b53d8d0e4876d0183841b565db34ca7092ffa412d111"
+    },
+    "fitness-coach": {
+      "source": "tatat/agents-playground",
+      "sourceType": "github",
+      "skillPath": "skills/fitness-coach/SKILL.md",
+      "computedHash": "88c892e9d56e93c21bdda878d767fadc9eb2ccfa01e27c825a8b1e894a27053b"
+    },
+    "fitness-wellness": {
+      "source": "dylantarre/animation-principles",
+      "sourceType": "github",
+      "skillPath": "skills/08-by-industry/fitness-wellness/SKILL.md",
+      "computedHash": "6b764946df8adf11feabee489056c740be74feb4911a2d3b2cb40aa44bb64863"
+    },
+    "floating-ui-vue-skilld": {
+      "source": "harlan-zw/vue-ecosystem-skills",
+      "sourceType": "github",
+      "skillPath": "skills/floating-ui-vue-skilld/SKILL.md",
+      "computedHash": "3fbb334207e19f37bc441eab09899a78a0b1cf516da323b24abb00af82afb46a"
+    },
+    "gym-training-expert": {
+      "source": "frankxai/claude-skills-library",
+      "sourceType": "github",
+      "skillPath": "free-skills/gym-training-expert/SKILL.md",
+      "computedHash": "25547b08b2b9cea21b60eb03667b206fe290f92d28c90b0987f6af903905f8db"
+    },
+    "mobile-app-ui-design": {
+      "source": "ceorkm/mobile-app-ui-design",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "b55732a1e5fbd0d00eb205d52af2bc72cfb9dbd13f8a7fd38d25acdc96f7ac5e"
+    },
+    "perplexity": {
+      "source": "softaworks/agent-toolkit",
+      "sourceType": "github",
+      "skillPath": "skills/perplexity/SKILL.md",
+      "computedHash": "1d32fbce001646737afa8208adaae6e8b1b6c74bd85eae492a9b89901e8c1668"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "648a7334f3dd6cc826e35d12c48318534caf75a2176d78ef1abd8e4a3cd15334"
+    },
+    "webapp-testing": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/webapp-testing/SKILL.md",
+      "computedHash": "3f14af7f5690695209c22fbf8c8d133769a86d64892602c09bb13f135e14e857"
+    }
+  }
+}
