@@ -1,2 +1,3 @@
-.agents/
-.claude/
+.agents/skills/
+.claude/skills/
+.worktrees/
