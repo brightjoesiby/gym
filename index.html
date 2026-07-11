@@ -406,6 +406,7 @@ function renderHome(){
   const todayLogged=!!(logs[currentUser]||[]).find(l=>l.date===today());
   const partnerLogged=!!(logs[p.id]||[]).find(l=>l.date===today());
   const plan=PROGRAM[todayPlanIdx()];
+  const todayLog=(getLogs()[currentUser]||[]).find(l=>l.date===today());
   const kcalPct=Math.round((tn.kcal/u.kcal)*100);
   const streak=getStreak(currentUser);
   const totalW=(logs[currentUser]||[]).length;
@@ -439,6 +440,7 @@ function renderHome(){
       ${plan.ex.slice(0,3).map(e=>`<div style="margin-bottom:2px">• ${e.n} — ${e.s}×${e.r}</div>`).join('')}
       ${plan.ex.length>3?`<div>+ ${plan.ex.length-3} more exercises</div>`:''}
     </div>
+    ${todayLog?.healthSync?`<div style="margin-top:8px"><span class="tag tg">🍎 ${todayLog.healthSync.kcal} kcal · ${todayLog.healthSync.duration} min · ${todayLog.healthSync.avgHR} bpm avg</span></div>`:''}
   </div>
 
   <!-- Calories -->
@@ -730,7 +732,11 @@ function renderProgress(){
       const plan=PROGRAM[log.programIdx]||{icon:'💪',type:'Workout'};
       return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
         <div style="font-size:24px">${plan.icon}</div>
-        <div style="flex:1"><div style="font-weight:600;font-size:14px">${plan.type}</div><div class="muted" style="font-size:12px">${log.date}</div></div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${plan.type}</div>
+          <div class="muted" style="font-size:12px">${log.date}</div>
+          ${log.healthSync?`<div style="font-size:11px;color:var(--green);margin-top:2px">🍎 ${log.healthSync.kcal} kcal · ${log.healthSync.duration} min</div>`:''}
+        </div>
         <span class="tag tg">Done ✓</span>
       </div>`;
     }).join('')}
