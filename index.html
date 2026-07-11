@@ -591,7 +591,7 @@ function renderLog(){
   ${plan.cardio?`<div class="card cg"><div style="font-weight:700">🏃 Cardio Finisher</div><div class="muted" style="margin-top:4px">${plan.cardio}</div></div>`:''}
 
   <button class="btn bp" style="background:${u.color}" onclick="saveWorkout()">
-    ${ls('fc_wlog_'+currentUser+'_'+today())?'✓ Workout Saved — Update':'Save Workout 💾'}
+    ${(getLogs()[currentUser]||[]).find(l=>l.date===today())?'✓ Workout Saved — Update':'Save Workout 💾'}
   </button>`;
 }
 
@@ -623,11 +623,13 @@ function saveWorkout(){
   const key='fc_logstate_'+currentUser+'_'+today();
   const exs=logState[key];
   const logs=getLogs();
-  const entry={date:today(),programIdx:todayPlanIdx(),exercises:exs,savedAt:new Date().toISOString()};
+  const existing=(logs[currentUser]||[]).find(l=>l.date===today());
+  const entry={date:today(),programIdx:todayPlanIdx(),exercises:exs,savedAt:new Date().toISOString(),
+    ...(existing?.healthSync?{healthSync:existing.healthSync}:{})};
   const userLogs=(logs[currentUser]||[]).filter(l=>l.date!==today());
-  logs[currentUser]=[...userLogs,entry];
-  ss('fc_logs',logs);
-  ss('fc_wlog_'+currentUser+'_'+today(),true);
+  const updated=[...userLogs,entry];
+  cloudState.logs={...cloudState.logs,[currentUser]:updated};
+  window.FCDB.update('logs', cloudState.logs);
   renderLog();
 }
 
@@ -718,13 +720,9 @@ function logWeight(){
   const w=parseFloat(inp.value);
   if(!w||w<30||w>250){inp.style.borderColor='var(--pink)';return}
   inp.style.borderColor='';
-  const weights=getWeights();
-  const entry={date:today(),weight:w};
-  const userW=weights[currentUser]||[];
-  const idx=userW.findIndex(l=>l.date===today());
-  if(idx>=0) userW[idx]=entry; else userW.push(entry);
-  weights[currentUser]=userW;
-  ss('fc_weights',weights);
+  const updated=mergeWeightEntry(getWeights(), currentUser, today(), w);
+  cloudState.weights={...cloudState.weights,[currentUser]:updated};
+  window.FCDB.update('weights', cloudState.weights);
   inp.value='';
   renderProgress();
 }
@@ -814,7 +812,7 @@ function toggleCustomForm(){
 
 function addNutritionEntry(meal){
   const nutr=getNutrition();
-  const userN=nutr[currentUser]||[];
+  const userN=(nutr[currentUser]||[]).slice();
   const idx=userN.findIndex(n=>n.date===today());
   if(idx>=0){
     userN[idx]={...userN[idx],
@@ -827,8 +825,8 @@ function addNutritionEntry(meal){
   } else {
     userN.push({date:today(),kcal:meal.kcal,protein:meal.p,carbs:meal.c,fat:meal.f,meals:[meal]});
   }
-  nutr[currentUser]=userN;
-  ss('fc_nutrition',nutr);
+  cloudState.nutrition={...cloudState.nutrition,[currentUser]:userN};
+  window.FCDB.update('nutrition', cloudState.nutrition);
   renderNutrition();
   if(currentTab==='home') renderHome();
 }
