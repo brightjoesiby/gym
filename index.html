@@ -936,50 +936,47 @@ function renderApple(){
     </div>
   </div>
 
-  <!-- Step 2: Log Workout Shortcut -->
+  <!-- Step 2: One-tap Log Workout Shortcut -->
   <div class="card cg">
-    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Step 2 — Build your "Log Workout" Shortcut</div>
-    <div class="muted" style="font-size:12px;margin-bottom:12px">One-time setup · Takes 3 minutes · Works from Watch & iPhone</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Step 2 — Build your "Log Gym Workout" Shortcut</div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">One-time setup · ~5 minutes · Pulls calories/duration/heart rate from Health straight into this app</div>
 
     ${[
-      {n:'Open Shortcuts app on iPhone', d:'Search "Shortcuts" in your app library'},
-      {n:'Tap + (top right) to create new', d:'This opens the shortcut builder'},
-      {n:'Tap "Add Action"', d:'Search for "Log Health Sample"'},
-      {n:'Set Type to "Workout"', d:'Tap the blue "Workout" pill → pick type'},
-      {n:'Set Workout type = "Traditional Strength Training"', d:'For Bright — change to "HIIT" for cardio days'},
-      {n:'Set Duration = "Ask Each Time"', d:'So you can enter how long you worked out'},
-      {n:'Set Active Calories = "Ask Each Time"', d:'You\'ll enter this after your session'},
-      {n:'Tap "Add Action" again → "Show Result"', d:'Confirms it worked'},
+      {n:'Open Shortcuts app on iPhone → tap + for a new shortcut', d:'This opens the shortcut builder'},
+      {n:'Add Action → "Find Workouts"', d:'Set it to sort by End Date, Descending, with a limit of 1 — this grabs your just-finished workout'},
+      {n:'Add Action → "Text"', d:`Build this exact text, tapping each bracket to insert the matching detail from Find Workouts: ?wh_user=${currentUser}&wh_kcal=[Active Energy Burned]&wh_dur=[Duration]&wh_hr=[Average Heart Rate]`},
+      {n:'Add Action → "URL"', d:'Combine https://brightjoesiby.github.io/gym/ with the Text output from the previous step'},
+      {n:'Add Action → "Open URLs"', d:'Pass in the URL variable — this opens the app and it auto-saves the synced data'},
       {n:'Name the shortcut "Log Gym Workout"', d:'Tap the shortcut name at top to rename'},
-      {n:'Add to Watch: Settings → Siri & Search → toggle shortcut', d:'Then it appears on your Watch\'s Siri watch face'},
+      {n:'Add to Watch: Settings → Siri & Search → toggle the shortcut', d:'Then it appears on your Watch\'s Siri watch face — run it right after ending your workout'},
     ].map((s,i)=>`
     <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
       <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#000;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
       <div>
         <div style="font-weight:600;font-size:13px">${s.n}</div>
-        <div class="muted" style="font-size:11px">${s.d}</div>
+        <div class="muted" style="font-size:11px">${esc(s.d)}</div>
       </div>
     </div>`).join('')}
   </div>
 
-  <!-- Step 3: Log Weight Shortcut -->
+  <!-- Step 3: One-tap Log Weight Shortcut -->
   <div class="card cp">
-    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Step 3 — Build "Log My Weight" Shortcut</div>
-    <div class="muted" style="font-size:12px;margin-bottom:12px">Log your morning weight to Apple Health in 2 taps</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Step 3 — Build your "Log My Weight" Shortcut</div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">Reads your latest Body Mass entry from Health and logs it here in one tap</div>
 
     ${[
       {n:'Create a new Shortcut', d:'Tap + in the Shortcuts app'},
-      {n:'Add Action → "Log Health Sample"', d:'Same as before'},
-      {n:'Set Type = "Body Mass"', d:'This logs body weight to Health'},
-      {n:'Set Value = "Ask Each Time"', d:'You\'ll type your weight in kg each morning'},
-      {n:'Set Unit = "kg"', d:'Tap the unit field and select kilograms'},
-      {n:'Name it "Log My Weight"', d:'Add to Watch via Settings → Siri same as above'},
+      {n:'Add Action → "Find Health Samples"', d:'Type = Body Mass, sort by most recent, limit 1'},
+      {n:'Add Action → "Text"', d:`Build: ?wt_user=${currentUser}&wt_kg=[Body Mass value from the sample]`},
+      {n:'Add Action → "URL"', d:'Combine https://brightjoesiby.github.io/gym/ with the Text output'},
+      {n:'Add Action → "Open URLs"', d:'Pass in the URL variable'},
+      {n:'Name it "Log My Weight"', d:'Add to Watch via Settings → Siri, same as the workout shortcut'},
     ].map((s,i)=>`
     <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
       <div style="width:24px;height:24px;border-radius:50%;background:var(--pink);color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
       <div>
         <div style="font-weight:600;font-size:13px">${s.n}</div>
-        <div class="muted" style="font-size:11px">${s.d}</div>
+        <div class="muted" style="font-size:11px">${esc(s.d)}</div>
       </div>
     </div>`).join('')}
   </div>
@@ -988,9 +985,9 @@ function renderApple(){
   <div class="card">
     <div style="font-size:16px;font-weight:800;margin-bottom:10px">Your Daily Routine 🗓</div>
     ${[
-      {time:'Morning', icon:'🌅', steps:['Weigh yourself → run "Log My Weight" shortcut','Open this app → check today\'s workout plan','Eat breakfast (check Nutrition tab for targets)']},
+      {time:'Morning', icon:'🌅', steps:['Weigh yourself → run "Log My Weight" shortcut (auto-fills into the app)','Open this app → check today\'s workout plan','Eat breakfast (check Nutrition tab for targets)']},
       {time:'At Gym', icon:'🏋️', steps:['Apple Watch → Workout app → start session','Open this app → Log tab → log your sets & reps','Watch tracks heart rate & calories automatically']},
-      {time:'After Gym', icon:'✅', steps:['End workout on Apple Watch (double-side-button)','Run "Log Gym Workout" shortcut → enter duration + calories','Tap "Save Workout" in this app\'s Log tab']},
+      {time:'After Gym', icon:'✅', steps:['End workout on Apple Watch (double-side-button)','Run "Log Gym Workout" shortcut — calories, duration & heart rate sync automatically, no typing','Tap "Save Workout" in this app\'s Log tab to record your sets & reps']},
       {time:'Evening', icon:'🌙', steps:['Log your meals in Nutrition tab','Check Apple Health app — all rings should close','View your couple progress in Home tab']},
     ].map(r=>`
     <div style="margin-bottom:14px">
