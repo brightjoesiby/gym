@@ -131,6 +131,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:10px}
 
 #toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--green);color:var(--text);padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;z-index:100;max-width:90%;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#offline-badge{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:var(--pink);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;z-index:101;display:none}
+#offline-badge.show{display:block}
 
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 </style>
@@ -174,30 +176,34 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     </button>
   </nav>
   <div id="toast"></div>
+  <div id="offline-badge">⏳ Offline — will sync when back online</div>
 </div>
 
 <script src="firebase-config.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getFirestore, collection, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const app = initializeApp(window.FC_FIREBASE_CONFIG);
   const db = getFirestore(app);
-  const docRef = doc(db, 'fitcouple', 'shared');
+  const usersCol = collection(db, 'fitcouple');
 
   window.FCDB = {
     subscribe(callback) {
-      onSnapshot(docRef, snap => {
-        const data = snap.exists() ? snap.data() : {};
-        callback({
-          logs: data.logs || {},
-          weights: data.weights || {},
-          nutrition: data.nutrition || {}
+      onSnapshot(usersCol, snap => {
+        const logs = {}, weights = {}, nutrition = {};
+        snap.forEach(docSnap => {
+          const uid = docSnap.id;
+          const data = docSnap.data();
+          logs[uid] = data.logs || [];
+          weights[uid] = data.weights || [];
+          nutrition[uid] = data.nutrition || [];
         });
+        callback({ logs, weights, nutrition });
       });
     },
-    update(fieldPath, value) {
-      return setDoc(docRef, { [fieldPath]: value }, { merge: true });
+    update(user, field, value) {
+      return setDoc(doc(db, 'fitcouple', user), { [field]: value }, { merge: true });
     }
   };
 </script>
@@ -320,6 +326,11 @@ function showToast(msg){
   clearTimeout(showToast._timer);
   showToast._timer=setTimeout(()=>t.classList.remove('show'),3500);
 }
+function updateOfflineBadge(){
+  el('offline-badge').classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', updateOfflineBadge);
+window.addEventListener('offline', updateOfflineBadge);
 
 let handoffProcessed=false;
 function handleIncomingHandoff(){
@@ -330,12 +341,18 @@ function handleIncomingHandoff(){
   if(result.type==='workout'){
     const updated=mergeHealthSync(cloudState.logs, result.user, today(), {kcal:result.kcal,duration:result.duration,avgHR:result.avgHR});
     cloudState.logs={...cloudState.logs,[result.user]:updated};
-    window.FCDB.update('logs', cloudState.logs);
+    window.FCDB.update(result.user, 'logs', updated).catch(err=>{
+      console.error('Sync failed', err);
+      showToast('⚠️ Sync failed — will retry when online');
+    });
     showToast(`✅ Synced from Apple Watch: ${result.kcal} kcal · ${result.duration} min`);
   } else if(result.type==='weight'){
     const updated=mergeWeightEntry(cloudState.weights, result.user, today(), result.weightKg);
     cloudState.weights={...cloudState.weights,[result.user]:updated};
-    window.FCDB.update('weights', cloudState.weights);
+    window.FCDB.update(result.user, 'weights', updated).catch(err=>{
+      console.error('Sync failed', err);
+      showToast('⚠️ Sync failed — will retry when online');
+    });
     showToast(`✅ Weight logged: ${result.weightKg}kg`);
   }
   history.replaceState({}, '', location.pathname);
@@ -664,7 +681,10 @@ function saveWorkout(){
   const userLogs=(logs[currentUser]||[]).filter(l=>l.date!==today());
   const updated=[...userLogs,entry];
   cloudState.logs={...cloudState.logs,[currentUser]:updated};
-  window.FCDB.update('logs', cloudState.logs);
+  window.FCDB.update(currentUser, 'logs', updated).catch(err=>{
+    console.error('Sync failed', err);
+    showToast('⚠️ Sync failed — will retry when online');
+  });
   renderLog();
 }
 
@@ -761,7 +781,10 @@ function logWeight(){
   inp.style.borderColor='';
   const updated=mergeWeightEntry(getWeights(), currentUser, today(), w);
   cloudState.weights={...cloudState.weights,[currentUser]:updated};
-  window.FCDB.update('weights', cloudState.weights);
+  window.FCDB.update(currentUser, 'weights', updated).catch(err=>{
+    console.error('Sync failed', err);
+    showToast('⚠️ Sync failed — will retry when online');
+  });
   inp.value='';
   renderProgress();
 }
@@ -865,7 +888,10 @@ function addNutritionEntry(meal){
     userN.push({date:today(),kcal:meal.kcal,protein:meal.p,carbs:meal.c,fat:meal.f,meals:[meal]});
   }
   cloudState.nutrition={...cloudState.nutrition,[currentUser]:userN};
-  window.FCDB.update('nutrition', cloudState.nutrition);
+  window.FCDB.update(currentUser, 'nutrition', userN).catch(err=>{
+    console.error('Sync failed', err);
+    showToast('⚠️ Sync failed — will retry when online');
+  });
   renderNutrition();
   if(currentTab==='home') renderHome();
 }
@@ -1022,6 +1048,7 @@ function renderApple(){
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 switchUser(currentUser);
 goTab('home');
+updateOfflineBadge();
 (function subscribeWhenReady(){
   if (window.FCDB) {
     window.FCDB.subscribe(data => {
