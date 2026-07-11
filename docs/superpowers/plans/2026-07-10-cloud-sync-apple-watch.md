@@ -345,8 +345,8 @@ Add this block in `index.html`, immediately before the `<script src="handoff.js"
 ```html
 <script src="firebase-config.js"></script>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const app = initializeApp(window.FC_FIREBASE_CONFIG);
   const db = getFirestore(app);
